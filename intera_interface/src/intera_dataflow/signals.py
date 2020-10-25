@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2013-2018, Rethink Robotics Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +19,7 @@ from weakref import WeakKeyDictionary
 try:
     from weakref import WeakSet
 except ImportError:
-    from weakrefset import WeakSet
+    from .weakrefset import WeakSet
 
 
 class Signal(object):

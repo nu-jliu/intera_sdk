@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright (c) 2013-2018, Rethink Robotics Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

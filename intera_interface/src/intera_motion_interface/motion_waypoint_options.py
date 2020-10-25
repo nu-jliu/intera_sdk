@@ -15,10 +15,11 @@
 # limitations under the License.
 
 
+from __future__ import absolute_import
 import rospy
 from intera_motion_msgs.msg import WaypointOptions
 from copy import deepcopy
-from utility_functions import (
+from .utility_functions import (
     ensure_path_to_file_exists,
     clamp_float_warn
 )

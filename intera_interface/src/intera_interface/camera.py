@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2013-2018, Rethink Robotics Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,7 @@ from sensor_msgs.msg import Image
 from intera_core_msgs.msg import IONodeConfiguration
 
 import intera_dataflow
-from robot_params import RobotParams
+from .robot_params import RobotParams
 from intera_io import IODeviceInterface
 
 

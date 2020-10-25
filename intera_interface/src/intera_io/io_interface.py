@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2013-2018, Rethink Robotics Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,7 @@ import threading
 import uuid
 from threading import Lock
 import intera_dataflow
-from io_command import SetCommand
+from .io_command import SetCommand
 
 from intera_core_msgs.msg import (
     IODeviceConfiguration,

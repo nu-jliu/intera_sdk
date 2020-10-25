@@ -15,9 +15,10 @@
 # limitations under the License.
 
 
+from __future__ import absolute_import
 import rospy
 from intera_core_msgs.msg import InteractionControlCommand
-from interaction_options import InteractionOptions
+from .interaction_options import InteractionOptions
 import intera_interface
 from intera_interface import CHECK_VERSION
 

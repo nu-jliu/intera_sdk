@@ -15,6 +15,7 @@
 # limitations under the License.
 
 
+from __future__ import print_function
 from copy import deepcopy
 import random
 import rospy
@@ -145,7 +146,7 @@ class RandomWalk(object):
         lower = max(low + pad*r, val - dist*r)
         upper = min(upp - pad*r, val + dist*r)
         if lower > upper:
-            print "No valid solution! Ignoring last sample value"
+            print("No valid solution! Ignoring last sample value")
             lower = low + pad*r
             upper = upp - pad*r
         return lower + (upper-lower)*random.random()

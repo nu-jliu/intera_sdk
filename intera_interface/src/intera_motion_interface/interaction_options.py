@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2016-2018, Rethink Robotics Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,7 @@ import rospy
 from intera_core_msgs.msg import InteractionControlCommand
 from geometry_msgs.msg import Pose, Point, Quaternion
 from copy import deepcopy
-from utility_functions import (
+from .utility_functions import (
     ensure_path_to_file_exists,
     clamp_float_warn
 )

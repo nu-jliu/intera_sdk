@@ -15,6 +15,7 @@
 # limitations under the License.
 
 
+from __future__ import absolute_import
 import rospy
 from geometry_msgs.msg import (
     PoseStamped,
@@ -26,10 +27,10 @@ from intera_motion_msgs.msg import (
 )
 from sensor_msgs.msg import JointState
 from copy import deepcopy
-from utility_functions import ensure_path_to_file_exists
+from .utility_functions import ensure_path_to_file_exists
 from rospy_message_converter import message_converter
 import yaml
-from motion_waypoint_options import MotionWaypointOptions
+from .motion_waypoint_options import MotionWaypointOptions
 from intera_interface import Limb
 
 class MotionWaypoint(object):

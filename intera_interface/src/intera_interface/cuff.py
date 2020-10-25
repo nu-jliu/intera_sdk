@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2013-2018, Rethink Robotics Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,7 @@ import rospy
 import intera_dataflow
 from intera_io import IODeviceInterface
 from intera_core_msgs.msg import IODeviceConfiguration
-from robot_params import RobotParams
+from .robot_params import RobotParams
 
 
 class Cuff(object):

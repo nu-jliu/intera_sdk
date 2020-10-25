@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright (c) 2013-2018, Rethink Robotics Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +31,7 @@ import intera_dataflow
 from intera_core_msgs.msg import (
     RobotAssemblyState,
 )
-import settings
+from . import settings
 
 
 class RobotEnable(object):
@@ -162,7 +163,7 @@ http://sdk.rethinkrobotics.com/intera/SDK_Shell
                 timeout_msg=error_env,
                 body=pub.publish
             )
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.ETIMEDOUT:
                 if self._state.error == True and self._state.stopped == False:
                     rospy.logwarn(error_nonfatal)

@@ -15,14 +15,15 @@
 """
 Intera RSDK Joint Trajectory Action Server
 """
+from __future__ import absolute_import
 import bisect
 from copy import deepcopy
 import math
 import operator
 import numpy as np
 
-import bezier
-import minjerk
+from . import bezier
+from . import minjerk
 
 import rospy
 
