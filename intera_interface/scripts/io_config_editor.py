@@ -17,6 +17,7 @@
 """
 SDK Read / Write ClickSmart (EndEffector) Configuration File
 """
+from __future__ import print_function
 
 import argparse
 import json
