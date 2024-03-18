@@ -81,7 +81,9 @@ class HomeJoints(object):
                 return False
             with self._hcb_lock:
                 if bool(self._homing_state):
-                    homing_joints = copy.deepcopy(self._homing_state.keys())
+                    for i in self._homing_state.keys():
+                        homing_joints.append(copy.deepcopy(i))
+                    #homing_joints = copy.deepcopy(self._homing_state.keys())
                     break
             sleep_rate.sleep()
         # Construct Homing Command

@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+
 # Copyright (c) 2013-2018, Rethink Robotics Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +27,7 @@ from .io_command import SetCommand
 from intera_core_msgs.msg import (
     IODeviceConfiguration,
     IODeviceStatus,
-    IOComponentCommand
+    IOComponentCommand,
 )
 
 
@@ -34,6 +35,7 @@ class IOInterface(object):
     """
     Base class for IO interfaces.
     """
+
     def __init__(self, path_root, config_msg_type, status_msg_type):
         self._path = path_root
         self.config_mutex = Lock()
@@ -46,31 +48,34 @@ class IOInterface(object):
         self.config_changed = intera_dataflow.Signal()
         self.state_changed = intera_dataflow.Signal()
 
-        self._config_sub = rospy.Subscriber(self._path + "/config",
-                                            config_msg_type,
-                                            self.handle_config)
-        self._state_sub = rospy.Subscriber(self._path + "/state",
-                                           status_msg_type,
-                                           self.handle_state)
-        self._command_pub = rospy.Publisher(self._path + "/command",
-                                            IOComponentCommand, queue_size=10)
+        self._config_sub = rospy.Subscriber(
+            self._path + "/config", config_msg_type, self.handle_config
+        )
+        self._state_sub = rospy.Subscriber(
+            self._path + "/state", status_msg_type, self.handle_state
+        )
+        self._command_pub = rospy.Publisher(
+            self._path + "/command", IOComponentCommand, queue_size=10
+        )
 
         # Wait for the config to be populated
         intera_dataflow.wait_for(
             lambda: self.config is not None and self.is_config_valid(),
             timeout=5.0,
-            timeout_msg=("Failed to get config at: {}.".format(self._path + "/config"))
+            timeout_msg=("Failed to get config at: {}.".format(self._path + "/config")),
         )
 
         # Wait for the state to be populated too (optional)
         is_init = intera_dataflow.wait_for(
             lambda: self.state is not None and self.is_state_valid(),
             timeout=5.0,
-            raise_on_error=False
+            raise_on_error=False,
         )
         if not is_init:
-            rospy.loginfo("Did not receive initial state at: {}."
-                " Device may not be activated yet.".format(self._path + "/state"))
+            rospy.loginfo(
+                "Did not receive initial state at: {}."
+                " Device may not be activated yet.".format(self._path + "/state")
+            )
 
         rospy.logdebug("Making new IOInterface on %s" % (self._path,))
 
@@ -138,7 +143,7 @@ class IOInterface(object):
             if state.name not in current_state:
                 current_state[state.name] = dict()
             formatting = json.loads(state.format)
-            current_state[state.name]["type"]  = formatting["type"]
+            current_state[state.name]["type"] = formatting["type"]
             current_state[state.name]["role"] = formatting["role"]
             data = json.loads(state.data)
             current_state[state.name]["data"] = data[0] if len(data) > 0 else None
@@ -151,7 +156,7 @@ class IOInterface(object):
             with self.state_mutex:
                 self.state = msg
                 self.state_changed()
-                self.load_state(self.ports,   self.state.ports)
+                self.load_state(self.ports, self.state.ports)
                 self.load_state(self.signals, self.state.signals)
 
     def publish_command(self, op, args, timeout=2.0):
@@ -162,10 +167,7 @@ class IOInterface(object):
         cmd_time = rospy.Time.now()
         self.cmd_times.append(cmd_time)
         self.cmd_times = self.cmd_times[-100:]  # cache last 100 cmd timestamps
-        cmd_msg = IOComponentCommand(
-            time=cmd_time,
-            op=op,
-            args=json.dumps(args))
+        cmd_msg = IOComponentCommand(time=cmd_time, op=op, args=json.dumps(args))
         rospy.logdebug("publish_command %s %s" % (cmd_msg.op, cmd_msg.args))
         if timeout != None:
             timeout_time = rospy.Time.now() + rospy.Duration(timeout)
@@ -194,11 +196,11 @@ class IODeviceInterface(IOInterface):
     """
     IO Device interface to config, status and command topics
     """
+
     def __init__(self, node_name, dev_name):
         super(IODeviceInterface, self).__init__(
-            'io/' + node_name + '/' + dev_name,
-            IODeviceConfiguration,
-            IODeviceStatus)
+            "io/" + node_name + "/" + dev_name, IODeviceConfiguration, IODeviceStatus
+        )
         self._threads = dict()
         self._callback_items = dict()
         self._callback_functions = dict()
@@ -208,7 +210,8 @@ class IODeviceInterface(IOInterface):
         return a list of all signals
         """
         with self.state_mutex:
-            return copy.deepcopy(self.signals.keys())
+            # return copy.deepcopy(self.signals.keys())
+            return copy.deepcopy(list(self.signals.keys()))
 
     def get_signal_type(self, signal_name):
         """
@@ -216,7 +219,7 @@ class IODeviceInterface(IOInterface):
         """
         with self.state_mutex:
             if signal_name in self.signals.keys():
-                return copy.deepcopy(self.signals[signal_name]['type'])
+                return copy.deepcopy(self.signals[signal_name]["type"])
         return None
 
     def get_signal_value(self, signal_name):
@@ -225,22 +228,29 @@ class IODeviceInterface(IOInterface):
         """
         with self.state_mutex:
             if signal_name in self.signals.keys():
-                return copy.deepcopy(self.signals[signal_name]['data'])
+                return copy.deepcopy(self.signals[signal_name]["data"])
         return None
 
-    def set_signal_value(self, signal_name, signal_value, signal_type=None, timeout=5.0):
+    def set_signal_value(
+        self, signal_name, signal_value, signal_type=None, timeout=5.0
+    ):
         """
         set the value for the given signal
         return True if the signal value is set, False if the requested signal is invalid
         """
         if signal_name not in self.list_signal_names():
-            rospy.logerr("Cannot find signal '{0}' in this IO Device ({1}).".format(signal_name,
-                self._path))
+            rospy.logerr(
+                "Cannot find signal '{0}' in this IO Device ({1}).".format(
+                    signal_name, self._path
+                )
+            )
             return
         if signal_type == None:
             s_type = self.get_signal_type(signal_name)
             if s_type == None:
-                rospy.logerr("Failed to get 'type' for signal '{0}'.".format(signal_name))
+                rospy.logerr(
+                    "Failed to get 'type' for signal '{0}'.".format(signal_name)
+                )
                 return
         else:
             s_type = signal_type
@@ -262,7 +272,7 @@ class IODeviceInterface(IOInterface):
         """
         with self.state_mutex:
             if port_name in self.ports.keys():
-                return copy.deepcopy(self.ports[port_name]['type'])
+                return copy.deepcopy(self.ports[port_name]["type"])
         return None
 
     def get_port_value(self, port_name):
@@ -271,7 +281,7 @@ class IODeviceInterface(IOInterface):
         """
         with self.state_mutex:
             if port_name in self.ports.keys():
-                return copy.deepcopy(self.ports[port_name]['data'])
+                return copy.deepcopy(self.ports[port_name]["data"])
         return None
 
     def set_port_value(self, port_name, port_value, port_type=None, timeout=5.0):
@@ -280,8 +290,11 @@ class IODeviceInterface(IOInterface):
         return True if the port value is set, False if the requested port is invalid
         """
         if port_name not in list_port_names():
-            rospy.logerr("Cannot find port '{0}' in this IO Device ({1}).".format(port_name,
-                self._path))
+            rospy.logerr(
+                "Cannot find port '{0}' in this IO Device ({1}).".format(
+                    port_name, self._path
+                )
+            )
             return
         if port_type == None:
             p_type = self.get_port_type(port_name)
@@ -315,15 +328,17 @@ class IODeviceInterface(IOInterface):
         if signal_name in self.list_signal_names():
             callback_id = uuid.uuid4()
             self._callback_items[callback_id] = intera_dataflow.Signal()
+
             def signal_spinner():
                 old_state = self.get_signal_value(signal_name)
                 r = rospy.Rate(poll_rate)
                 while not rospy.is_shutdown():
-                  new_state = self.get_signal_value(signal_name)
-                  if new_state != old_state:
-                      self._callback_items[callback_id](new_state)
-                  old_state = new_state
-                  r.sleep()
+                    new_state = self.get_signal_value(signal_name)
+                    if new_state != old_state:
+                        self._callback_items[callback_id](new_state)
+                    old_state = new_state
+                    r.sleep()
+
             self._callback_items[callback_id].connect(callback_function)
             t = threading.Thread(target=signal_spinner)
             t.daemon = True
@@ -345,7 +360,8 @@ class IODeviceInterface(IOInterface):
         """
         if callback_id in self._threads.keys():
             self._callback_items[callback_id].disconnect(
-                              self._callback_functions[callback_id])
+                self._callback_functions[callback_id]
+            )
             return True
         else:
             return False
